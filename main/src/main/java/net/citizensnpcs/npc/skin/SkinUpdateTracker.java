@@ -84,6 +84,11 @@ public class SkinUpdateTracker {
         if (playerLoc.distanceSquared(skinLoc) > viewDistance)
             return false;
 
+        //TODO
+        //Edited this so it always return true, never checks FOV.
+        return true;
+
+        /*
         // see if the NPC is within the players field of view
         if (checkFov) {
             double deltaX = skinLoc.getX() - playerLoc.getX();
@@ -106,6 +111,7 @@ public class SkinUpdateTracker {
         }
 
         return true;
+        */
     }
 
     private Iterable<NPC> getAllNPCs() {

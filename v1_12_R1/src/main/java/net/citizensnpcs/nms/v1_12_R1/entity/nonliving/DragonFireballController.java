@@ -19,6 +19,7 @@ import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.World;
 
 public class DragonFireballController extends MobEntityController {
+
     public DragonFireballController() {
         super(EntityDragonFireballNPC.class);
     }

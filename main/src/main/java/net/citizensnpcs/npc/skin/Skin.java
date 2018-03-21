@@ -44,7 +44,6 @@ public class Skin {
      *
      * @param skinName
      *            The name of the player the skin belongs to.
-     * @param forceUpdate
      */
     Skin(String skinName) {
         this.skinName = skinName.toLowerCase();
@@ -74,17 +73,27 @@ public class Skin {
      */
     public boolean apply(SkinnableEntity entity) {
         Preconditions.checkNotNull(entity);
-
         NPC npc = entity.getNPC();
 
+
+        //Todo
+        //This is a custom edit to handle all skins as if they are cached.
+        String texture = npc.data().get(NPC.PLAYER_SKIN_TEXTURE_PROPERTIES_METADATA, "cache");
+        String signature = npc.data().get(NPC.PLAYER_SKIN_TEXTURE_PROPERTIES_SIGN_METADATA);
+
+        Property localData = new Property("textures", texture, signature);
+        setNPCTexture(entity, localData);
+
+        return true;
+
+        /*
         // Use npc cached skin if available.
         // If npc requires latest skin, cache is used for faster
         // availability until the latest skin can be loaded.
         String cachedName = npc.data().get(CACHED_SKIN_UUID_NAME_METADATA);
         String texture = npc.data().get(NPC.PLAYER_SKIN_TEXTURE_PROPERTIES_METADATA, "cache");
         if (this.skinName.equals(cachedName) && !texture.equals("cache")) {
-            Property localData = new Property("textures", texture,
-                    npc.data().<String> get(NPC.PLAYER_SKIN_TEXTURE_PROPERTIES_SIGN_METADATA));
+            Property localData = new Property("textures", texture, npc.data().<String> get(NPC.PLAYER_SKIN_TEXTURE_PROPERTIES_SIGN_METADATA));
             setNPCTexture(entity, localData);
 
             // check if NPC prefers to use cached skin over the latest skin.
@@ -106,6 +115,7 @@ public class Skin {
         setNPCSkinData(entity, skinName, skinId, skinData);
 
         return true;
+        */
     }
 
     /**
