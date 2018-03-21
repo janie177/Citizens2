@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,7 +33,6 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftWither;
 import org.bukkit.craftbukkit.v1_12_R1.event.CraftEventFactory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
@@ -186,6 +186,7 @@ import net.minecraft.server.v1_12_R1.EntityBird;
 import net.minecraft.server.v1_12_R1.EntityEnderDragon;
 import net.minecraft.server.v1_12_R1.EntityFishingHook;
 import net.minecraft.server.v1_12_R1.EntityHorse;
+import net.minecraft.server.v1_12_R1.EntityHorseAbstract;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityInsentient;
 import net.minecraft.server.v1_12_R1.EntityLiving;
@@ -288,7 +289,9 @@ public class NMSImpl implements NMSBridge {
             throw new IllegalStateException("NMS.fillProfileProperties cannot be invoked from the main thread.");
 
         MinecraftSessionService sessionService = ((CraftServer) Bukkit.getServer()).getServer().az();
-
+        if (!(sessionService instanceof YggdrasilMinecraftSessionService)) {
+            return sessionService.fillProfileProperties(profile, requireSecure);
+        }
         YggdrasilAuthenticationService auth = ((YggdrasilMinecraftSessionService) sessionService)
                 .getAuthenticationService();
 
@@ -549,6 +552,9 @@ public class NMSImpl implements NMSBridge {
     @Override
     public org.bukkit.entity.Entity getVehicle(org.bukkit.entity.Entity entity) {
         Entity handle = NMSImpl.getHandle(entity);
+        if (handle == null) {
+            return null;
+        }
         Entity e = handle.getVehicle();
         return (e == handle || e == null) ? null : e.getBukkitEntity();
     }
@@ -725,6 +731,7 @@ public class NMSImpl implements NMSBridge {
     @Override
     public void look(org.bukkit.entity.Entity from, org.bukkit.entity.Entity to) {
         Entity handle = NMSImpl.getHandle(from), target = NMSImpl.getHandle(to);
+        BAD_CONTROLLER_LOOK.add(EntityType.SHULKER);
         if (BAD_CONTROLLER_LOOK.contains(handle.getBukkitEntity().getType())) {
             if (to instanceof LivingEntity) {
                 look(from, ((LivingEntity) to).getEyeLocation(), false, true);
@@ -753,14 +760,14 @@ public class NMSImpl implements NMSBridge {
     }
 
     @Override
-    public void openHorseScreen(Horse horse, Player equipper) {
-        EntityLiving handle = NMSImpl.getHandle(horse);
+    public void openHorseScreen(Tameable horse, Player equipper) {
+        EntityLiving handle = NMSImpl.getHandle((LivingEntity) horse);
         EntityLiving equipperHandle = NMSImpl.getHandle(equipper);
         if (handle == null || equipperHandle == null)
             return;
         boolean wasTamed = horse.isTamed();
         horse.setTamed(true);
-        ((EntityHorse) handle).a((EntityHuman) equipperHandle);
+        ((EntityHorseAbstract) handle).c((EntityHuman) equipperHandle);
         horse.setTamed(wasTamed);
     }
 
@@ -952,6 +959,11 @@ public class NMSImpl implements NMSBridge {
         } else if (handle instanceof EntityHumanNPC) {
             ((EntityHumanNPC) handle).setShouldJump();
         }
+    }
+
+    @Override
+    public void setShulkerColor(Shulker shulker, DyeColor color) {
+        ((EntityShulker) getHandle(shulker)).getDataWatcher().set(EntityShulker.COLOR, color.getDyeData());
     }
 
     @Override
@@ -1489,12 +1501,12 @@ public class NMSImpl implements NMSBridge {
 
     public static void updateNavigation(NavigationAbstract navigation) {
         navigation.d();
-    }
+    };
 
-    private static Field ADVANCEMENT_PLAYER_FIELD = NMS.getFinalField(EntityPlayer.class, "bY");;
+    private static Field ADVANCEMENT_PLAYER_FIELD = NMS.getFinalField(EntityPlayer.class, "bY");
     private static final Set<EntityType> BAD_CONTROLLER_LOOK = EnumSet.of(EntityType.POLAR_BEAR, EntityType.SILVERFISH,
-            EntityType.ENDERMITE, EntityType.ENDER_DRAGON, EntityType.BAT, EntityType.SLIME, EntityType.MAGMA_CUBE,
-            EntityType.HORSE, EntityType.GHAST);
+            EntityType.SHULKER, EntityType.ENDERMITE, EntityType.ENDER_DRAGON, EntityType.BAT, EntityType.SLIME,
+            EntityType.MAGMA_CUBE, EntityType.HORSE, EntityType.GHAST);
     private static final Field CRAFT_BOSSBAR_HANDLE_FIELD = NMS.getField(CraftBossBar.class, "handle");
     private static final float DEFAULT_SPEED = 1F;
     private static final Field ENDERDRAGON_BATTLE_BAR_FIELD = NMS.getField(EnderDragonBattle.class, "c");
@@ -1511,6 +1523,7 @@ public class NMSImpl implements NMSBridge {
     private static final Field RABBIT_FIELD = NMS.getField(EntityRabbit.class, "bx");
     private static final Random RANDOM = Util.getFastRandom();
     private static Field SKULL_PROFILE_FIELD;
+
     private static Field TRACKED_ENTITY_SET = NMS.getField(EntityTracker.class, "c");
 
     private static final Field WITHER_BOSS_BAR_FIELD = NMS.getField(EntityWither.class, "bG");

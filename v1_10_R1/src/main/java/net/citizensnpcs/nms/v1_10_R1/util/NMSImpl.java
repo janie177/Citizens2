@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,7 +33,6 @@ import org.bukkit.craftbukkit.v1_10_R1.entity.CraftWither;
 import org.bukkit.craftbukkit.v1_10_R1.event.CraftEventFactory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
@@ -262,6 +262,9 @@ public class NMSImpl implements NMSBridge {
 
         MinecraftSessionService sessionService = ((CraftServer) Bukkit.getServer()).getServer().ay();
 
+        if (!(sessionService instanceof YggdrasilMinecraftSessionService)) {
+            return sessionService.fillProfileProperties(profile, requireSecure);
+        }
         YggdrasilAuthenticationService auth = ((YggdrasilMinecraftSessionService) sessionService)
                 .getAuthenticationService();
 
@@ -503,6 +506,9 @@ public class NMSImpl implements NMSBridge {
     @Override
     public org.bukkit.entity.Entity getVehicle(org.bukkit.entity.Entity entity) {
         Entity handle = NMSImpl.getHandle(entity);
+        if (handle == null) {
+            return null;
+        }
         Entity e = handle.getVehicle();
         return (e == handle || e == null) ? null : e.getBukkitEntity();
     }
@@ -686,14 +692,14 @@ public class NMSImpl implements NMSBridge {
     }
 
     @Override
-    public void openHorseScreen(Horse horse, Player equipper) {
-        EntityLiving handle = NMSImpl.getHandle(horse);
+    public void openHorseScreen(Tameable horse, Player equipper) {
+        EntityLiving handle = NMSImpl.getHandle((LivingEntity) horse);
         EntityLiving equipperHandle = NMSImpl.getHandle(equipper);
         if (handle == null || equipperHandle == null)
             return;
         boolean wasTamed = horse.isTamed();
         horse.setTamed(true);
-        ((EntityHorse) handle).a((EntityHuman) equipperHandle);
+        ((EntityHorse) handle).f((EntityHuman) equipperHandle);
         horse.setTamed(wasTamed);
     }
 
@@ -876,6 +882,10 @@ public class NMSImpl implements NMSBridge {
         } else if (handle instanceof EntityHumanNPC) {
             ((EntityHumanNPC) handle).setShouldJump();
         }
+    }
+
+    @Override
+    public void setShulkerColor(Shulker shulker, DyeColor color) {
     }
 
     @Override

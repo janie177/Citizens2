@@ -1,5 +1,4 @@
-package net.citizensnpcs.nms.v1_12_R1.entity;
-
+package net.citizensnpcs.nms.v1_12_R1.entity; import net.minecraft.server.v1_12_R1.DamageSource;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;

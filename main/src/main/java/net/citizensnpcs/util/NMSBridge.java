@@ -3,13 +3,13 @@ package net.citizensnpcs.util;
 import java.util.Collection;
 import java.util.List;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
@@ -90,7 +90,7 @@ public interface NMSBridge {
 
     public void mount(Entity entity, Entity passenger);
 
-    public void openHorseScreen(Horse horse, Player equipper);
+    public void openHorseScreen(Tameable horse, Player equipper);
 
     public void playAnimation(PlayerAnimation animation, Player player, int radius);
 
@@ -125,6 +125,8 @@ public interface NMSBridge {
     public void setProfile(SkullMeta meta, GameProfile profile);
 
     public void setShouldJump(Entity entity);
+
+    public void setShulkerColor(Shulker entity, DyeColor color);
 
     public void setShulkerPeek(Shulker shulker, int peek);
 

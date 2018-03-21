@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -32,7 +33,6 @@ import org.bukkit.craftbukkit.v1_11_R1.entity.CraftWither;
 import org.bukkit.craftbukkit.v1_11_R1.event.CraftEventFactory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Shulker;
@@ -100,6 +100,7 @@ import net.citizensnpcs.nms.v1_11_R1.entity.PolarBearController;
 import net.citizensnpcs.nms.v1_11_R1.entity.RabbitController;
 import net.citizensnpcs.nms.v1_11_R1.entity.SheepController;
 import net.citizensnpcs.nms.v1_11_R1.entity.ShulkerController;
+import net.citizensnpcs.nms.v1_11_R1.entity.ShulkerController.EntityShulkerNPC;
 import net.citizensnpcs.nms.v1_11_R1.entity.SilverfishController;
 import net.citizensnpcs.nms.v1_11_R1.entity.SkeletonController;
 import net.citizensnpcs.nms.v1_11_R1.entity.SkeletonStrayController;
@@ -182,6 +183,7 @@ import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityEnderDragon;
 import net.minecraft.server.v1_11_R1.EntityFishingHook;
 import net.minecraft.server.v1_11_R1.EntityHorse;
+import net.minecraft.server.v1_11_R1.EntityHorseAbstract;
 import net.minecraft.server.v1_11_R1.EntityHuman;
 import net.minecraft.server.v1_11_R1.EntityInsentient;
 import net.minecraft.server.v1_11_R1.EntityLiving;
@@ -284,6 +286,9 @@ public class NMSImpl implements NMSBridge {
 
         MinecraftSessionService sessionService = ((CraftServer) Bukkit.getServer()).getServer().az();
 
+        if (!(sessionService instanceof YggdrasilMinecraftSessionService)) {
+            return sessionService.fillProfileProperties(profile, requireSecure);
+        }
         YggdrasilAuthenticationService auth = ((YggdrasilMinecraftSessionService) sessionService)
                 .getAuthenticationService();
 
@@ -544,6 +549,9 @@ public class NMSImpl implements NMSBridge {
     @Override
     public org.bukkit.entity.Entity getVehicle(org.bukkit.entity.Entity entity) {
         Entity handle = NMSImpl.getHandle(entity);
+        if (handle == null) {
+            return null;
+        }
         Entity e = handle.getVehicle();
         return (e == handle || e == null) ? null : e.getBukkitEntity();
     }
@@ -745,14 +753,14 @@ public class NMSImpl implements NMSBridge {
     }
 
     @Override
-    public void openHorseScreen(Horse horse, Player equipper) {
-        EntityLiving handle = NMSImpl.getHandle(horse);
+    public void openHorseScreen(Tameable horse, Player equipper) {
+        EntityLiving handle = NMSImpl.getHandle((LivingEntity) horse);
         EntityLiving equipperHandle = NMSImpl.getHandle(equipper);
         if (handle == null || equipperHandle == null)
             return;
         boolean wasTamed = horse.isTamed();
         horse.setTamed(true);
-        ((EntityHorse) handle).a((EntityHuman) equipperHandle);
+        ((EntityHorseAbstract) handle).f((EntityHuman) equipperHandle);
         horse.setTamed(wasTamed);
     }
 
@@ -937,6 +945,11 @@ public class NMSImpl implements NMSBridge {
         } else if (handle instanceof EntityHumanNPC) {
             ((EntityHumanNPC) handle).setShouldJump();
         }
+    }
+
+    @Override
+    public void setShulkerColor(Shulker shulker, DyeColor color) {
+        ((EntityShulkerNPC) getHandle(shulker)).setColor(color);
     }
 
     @Override
