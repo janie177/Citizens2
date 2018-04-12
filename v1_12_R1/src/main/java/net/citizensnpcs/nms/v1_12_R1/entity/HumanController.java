@@ -1,4 +1,5 @@
-package net.citizensnpcs.nms.v1_12_R1.entity; import net.minecraft.server.v1_12_R1.DamageSource;
+package net.citizensnpcs.nms.v1_12_R1.entity; import net.citizensnpcs.nms.v1_12_R1.scoreboards.ScoreboardUtil;
+import net.minecraft.server.v1_12_R1.DamageSource;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -97,22 +98,7 @@ public class HumanController extends AbstractEntityController {
                         npc.data().get("removefromplayerlist", removeFromPlayerList));
 
                 if (Setting.USE_SCOREBOARD_TEAMS.asBoolean()) {
-                    Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-                    String teamName = profile.getId().toString().substring(0, 16);
-
-                    Team team = scoreboard.getTeam(teamName);
-                    if (team == null) {
-                        team = scoreboard.registerNewTeam(teamName);
-                        if (prefixCapture != null) {
-                            team.setPrefix(prefixCapture);
-                        }
-                        if (suffixCapture != null) {
-                            team.setSuffix(suffixCapture);
-                        }
-                    }
-                    team.addPlayer(handle.getBukkitEntity());
-
-                    handle.getNPC().data().set(NPC.SCOREBOARD_FAKE_TEAM_NAME_METADATA, teamName);
+                    ScoreboardUtil.addToAllPlayers(prefixCapture, suffixCapture, profile.getId(), handle);
                 }
             }
         }, 20);

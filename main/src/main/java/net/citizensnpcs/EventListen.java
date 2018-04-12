@@ -6,10 +6,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import net.citizensnpcs.npc.CitizensNPC;
+import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
@@ -231,6 +236,17 @@ public class EventListen implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerJoin2(PlayerJoinEvent e) {
+        for(World world : ((CraftServer)Bukkit.getServer()).getServer().worlds) {
+            for(EntityHuman player : world.players) {
+                if(player.getClass() == NMS.getEntityHumanClass()) {
+
+                }
+            }
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         final NPC npc = npcRegistry.getNPC(event.getEntity());
@@ -248,12 +264,16 @@ public class EventListen implements Listener {
 
         if (npc.data().has(NPC.SCOREBOARD_FAKE_TEAM_NAME_METADATA)) {
             String teamName = npc.data().get(NPC.SCOREBOARD_FAKE_TEAM_NAME_METADATA);
-            Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
-            if (team != null) {
-                team.unregister();
-            }
 
-            npc.data().remove(NPC.SCOREBOARD_FAKE_TEAM_NAME_METADATA);
+            for(Player p : Bukkit.getOnlinePlayers()) {
+
+                Team team = p.getScoreboard().getTeam(teamName);
+                if (team != null) {
+                    team.unregister();
+                }
+
+                npc.data().remove(NPC.SCOREBOARD_FAKE_TEAM_NAME_METADATA);
+            }
         }
 
         if (npc.data().get(NPC.RESPAWN_DELAY_METADATA, -1) >= 0) {

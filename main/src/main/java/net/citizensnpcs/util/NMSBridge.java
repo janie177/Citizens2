@@ -36,6 +36,10 @@ import net.citizensnpcs.npc.skin.SkinnableEntity;
 public interface NMSBridge {
     public boolean addEntityToWorld(Entity entity, SpawnReason custom);
 
+    public Class getEntityHumanClass();
+
+    public void updateForPlayer(Player player);
+
     public void addOrRemoveFromPlayerList(Entity entity, boolean remove);
 
     public void attack(LivingEntity attacker, LivingEntity target);

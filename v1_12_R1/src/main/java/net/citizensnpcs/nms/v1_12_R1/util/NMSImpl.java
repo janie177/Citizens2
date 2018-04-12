@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import net.citizensnpcs.nms.v1_12_R1.scoreboards.ScoreboardUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -229,6 +230,16 @@ public class NMSImpl implements NMSBridge {
     @Override
     public boolean addEntityToWorld(org.bukkit.entity.Entity entity, SpawnReason custom) {
         return getHandle(entity).world.addEntity(getHandle(entity), custom);
+    }
+
+    @Override
+    public Class getEntityHumanClass() {
+        return EntityHumanNPC.class;
+    }
+
+    @Override
+    public void updateForPlayer(Player player) {
+        ScoreboardUtil.addEntryToPlayer();
     }
 
     @Override

@@ -40,6 +40,14 @@ public class NMS {
         // util class
     }
 
+    public static Class getEntityHumanClass() {
+        return BRIDGE.getEntityHumanClass();
+    }
+
+    public static void updateForPlayer(Player player) {
+
+    }
+
     public static boolean addEntityToWorld(org.bukkit.entity.Entity entity, SpawnReason custom) {
         return BRIDGE.addEntityToWorld(entity, custom);
     }

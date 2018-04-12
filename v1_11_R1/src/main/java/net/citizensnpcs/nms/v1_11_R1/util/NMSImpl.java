@@ -228,6 +228,16 @@ public class NMSImpl implements NMSBridge {
     }
 
     @Override
+    public Class getEntityHumanClass() {
+        return null;
+    }
+
+    @Override
+    public void updateForPlayer(Player player) {
+
+    }
+
+    @Override
     public void addOrRemoveFromPlayerList(org.bukkit.entity.Entity entity, boolean remove) {
         if (entity == null)
             return;
